@@ -5,14 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.tmdb.Model.DefaultMovies;
-import com.example.tmdb.Model.Movie;
 import com.example.tmdb.R;
 
 import java.util.ArrayList;
@@ -21,14 +19,24 @@ public class DefaultAdapter extends RecyclerView.Adapter<DefaultAdapter.DefaultV
 
     private Context context;
     private ArrayList<DefaultMovies> list;
-    private OnItemClickListener mListener;
+    private OnItemClickListener mListener, kListner, topRListener;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
+        void onItemUPClick(int position);
+        void onItemTopClick(int position);
+    }
+
+    public void setOnItemUPClickListener(OnItemClickListener listener){
+        kListner = listener;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener){
         mListener = listener;
+    }
+
+    public void setOnItemTopRatedClickListener(OnItemClickListener listener){
+        topRListener = listener;
     }
 
     public DefaultAdapter(Context context, ArrayList<DefaultMovies> list) {
@@ -47,10 +55,8 @@ public class DefaultAdapter extends RecyclerView.Adapter<DefaultAdapter.DefaultV
     public void onBindViewHolder(@NonNull DefaultViewHolder holder, int position) {
         DefaultMovies defaultMovies = list.get(position);
 
-        String title = defaultMovies.getTitle();
         String imageURL = defaultMovies.getPoster_path();
 
-        holder.textTitle.setText(title);
         Glide.with(context).load(imageURL).into(holder.movie_poster);
     }
 
@@ -60,14 +66,13 @@ public class DefaultAdapter extends RecyclerView.Adapter<DefaultAdapter.DefaultV
     }
 
     public class DefaultViewHolder extends RecyclerView.ViewHolder {
-        public TextView textTitle;
+
         public ImageView movie_poster;
 
         public DefaultViewHolder(View itemView) {
             super(itemView);
 
             movie_poster = itemView.findViewById(R.id.movie_poster);
-            textTitle = itemView.findViewById(R.id.title);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -76,6 +81,20 @@ public class DefaultAdapter extends RecyclerView.Adapter<DefaultAdapter.DefaultV
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION){
                             mListener.onItemClick(position);
+                        }
+                    }
+
+                    if (kListner != null){
+                        int pos = getAdapterPosition();
+                        if (pos != RecyclerView.NO_POSITION){
+                            kListner.onItemUPClick(pos);
+                        }
+                    }
+
+                    if (topRListener != null){
+                        int pos = getAdapterPosition();
+                        if (pos != RecyclerView.NO_POSITION){
+                            topRListener.onItemTopClick(pos);
                         }
                     }
                 }

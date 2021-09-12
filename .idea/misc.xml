@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/drawable/custom_background.xml" value="0.188" />
+        <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/drawable/gradient_background.xml" value="0.19054054054054054" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/drawable/ic_round_movie_filter_24.xml" value="0.188" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/drawable/ic_round_search_24.xml" value="0.18518518518518517" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/drawable/splash.xml" value="0.20925925925925926" />
@@ -12,9 +13,10 @@
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/cast_dialog.xml" value="0.17657657657657658" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/cast_layout.xml" value="0.16574074074074074" />
+        <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/category_layout.xml" value="0.17657657657657658" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/default_layout.xml" value="0.20765765765765765" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/item.xml" value="0.22" />
-        <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/provider_layout.xml" value="0.17657657657657658" />
+        <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/provider_layout.xml" value="0.33" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/similar_layout.xml" value="0.2" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/layout/upcoming.xml" value="0.2" />
         <entry key="..\:/Users/kaust/AndroidStudioProjects/TMDB/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1125" />

@@ -24,6 +24,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -33,7 +34,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.tmdb.Adapter.CastAdapter;
+import com.example.tmdb.Adapter.GenresAdapter;
 import com.example.tmdb.Model.Cast;
+import com.example.tmdb.Model.Genres;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,11 +53,13 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
     BlurView blurView;
     Intent intent;
     String poster_path, original_language ,title, backdrop_path, overview, release_date, votes, id;
-    TextView titleV, overviewV, releaseDateV, langV, ratingsV;
-    RecyclerView castRV;
+    TextView titleV, overviewV, releaseDateV, langV, ratingsV, statusV;
+    RecyclerView castRV, categoryRV;
     private RequestQueue mRequestQueue;
     private ArrayList<Cast> castArrayList;
+    private ArrayList<Genres> genresArrayList;
     private CastAdapter castAdapter;
+    private GenresAdapter genresAdapter;
 
 
 
@@ -68,6 +73,9 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
         castRV = findViewById(R.id.castRV);
         castRV.setHasFixedSize(true);
         castRV.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
+        categoryRV = findViewById(R.id.categoryRV);
+        categoryRV.setHasFixedSize(true);
+        categoryRV.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
         backgroundPoster = findViewById(R.id.backgroundPoster);
         movie_posterV = findViewById(R.id.movie_posterV);
         intent = getIntent();
@@ -76,8 +84,10 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
         overviewV = findViewById(R.id.overviewV);
         releaseDateV = findViewById(R.id.releaseDateV);
         ratingsV = findViewById(R.id.ratingsV);
+        statusV = findViewById(R.id.status);
 
         castArrayList = new ArrayList<>();
+        genresArrayList = new ArrayList<>();
         mRequestQueue = Volley.newRequestQueue(this);
 
 
@@ -101,7 +111,43 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
         Glide.with(this).load(poster_path).into(movie_posterV);
 
         showCast(id);
-        //getProvidersForSpecificMovie(id);
+        getMovieCategory(id);
+    }
+
+    private void getMovieCategory(String id) {
+        String URL = "https://api.themoviedb.org/3/movie/"+id+"?api_key=dda6d5e001bdb5b75de31631ec3fa716&language=en-US";
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+                    String status= response.getString("status");
+
+                    statusV.setText(status);
+
+                    JSONArray jsonArray = response.getJSONArray("genres");
+                    for (int i=0;i<jsonArray.length();i++){
+                        JSONObject res = jsonArray.getJSONObject(i);
+
+                        String name = res.getString("name");
+                        genresArrayList.add(new Genres(name));
+                    }
+                    genresAdapter = new GenresAdapter(DetailsActivity.this, genresArrayList);
+                    categoryRV.setAdapter(genresAdapter);
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        mRequestQueue.add(request);
     }
 
     private void showCast(String id_Film) {
@@ -146,7 +192,7 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
     private void theme() {
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+
         float radius = 5f;
 
         View decorView = getWindow().getDecorView();

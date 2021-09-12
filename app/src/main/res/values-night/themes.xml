@@ -20,7 +20,7 @@
         <item name="colorPrimaryDark">#032541</item>
         <item name="colorAccent">#032541</item>
         <item name="android:navigationBarColor">#032541</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="statusBarBackground">#032541</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
@@ -28,12 +28,12 @@
     </style>
 
     <style name="FullScreen" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">#032541</item>
-        <item name="colorPrimaryDark">#032541</item>
-        <item name="colorAccent">#032541</item>
-        <item name="android:navigationBarColor">#032541</item>
+        <item name="colorPrimary">#FFFFFF</item>
+        <item name="colorPrimaryDark">#FFFFFF</item>
+        <item name="colorAccent">#FFFFFF</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="statusBarBackground">#032541</item>
+        <item name="statusBarBackground">#FFFFFF</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentNavigation">false</item>
