@@ -34,9 +34,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.tmdb.Adapter.CastAdapter;
+import com.example.tmdb.Adapter.DefaultAdapter;
 import com.example.tmdb.Adapter.GenresAdapter;
 import com.example.tmdb.Model.Cast;
+import com.example.tmdb.Model.DefaultMovies;
 import com.example.tmdb.Model.Genres;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,19 +50,22 @@ import java.util.ArrayList;
 import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
 
-public class DetailsActivity extends AppCompatActivity implements CastAdapter.OnItemClickListener {
+public class DetailsActivity extends AppCompatActivity implements CastAdapter.OnItemClickListener, DefaultAdapter.OnItemClickListener {
 
     ImageView backgroundPoster, movie_posterV;
     BlurView blurView;
     Intent intent;
+    FloatingActionButton back;
     String poster_path, original_language ,title, backdrop_path, overview, release_date, votes, id;
     TextView titleV, overviewV, releaseDateV, langV, ratingsV, statusV;
-    RecyclerView castRV, categoryRV;
+    RecyclerView castRV, categoryRV, recommendationRV;
     private RequestQueue mRequestQueue;
     private ArrayList<Cast> castArrayList;
     private ArrayList<Genres> genresArrayList;
+    private ArrayList<DefaultMovies> similarArrayList;
     private CastAdapter castAdapter;
     private GenresAdapter genresAdapter;
+    private DefaultAdapter similarAdapter;
 
 
 
@@ -70,12 +76,22 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
 
         blurView = findViewById(R.id.blurView);
         theme();
+        back = findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         castRV = findViewById(R.id.castRV);
         castRV.setHasFixedSize(true);
         castRV.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
         categoryRV = findViewById(R.id.categoryRV);
         categoryRV.setHasFixedSize(true);
         categoryRV.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
+        recommendationRV = findViewById(R.id.recommendationRV);
+        recommendationRV.setHasFixedSize(true);
+        recommendationRV.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
         backgroundPoster = findViewById(R.id.backgroundPoster);
         movie_posterV = findViewById(R.id.movie_posterV);
         intent = getIntent();
@@ -88,6 +104,7 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
 
         castArrayList = new ArrayList<>();
         genresArrayList = new ArrayList<>();
+        similarArrayList = new ArrayList<>();
         mRequestQueue = Volley.newRequestQueue(this);
 
 
@@ -100,18 +117,58 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
         votes = intent.getStringExtra(VOTE);
         id = intent.getStringExtra(ID);
 
-
-
         titleV.setText(title);
         ratingsV.setText(votes);
         overviewV.setText(overview);
         langV.setText(original_language);
-        releaseDateV.setText("In theaters from "+release_date);
+        releaseDateV.setText("Release date: "+release_date);
         Glide.with(this).load(backdrop_path).into(backgroundPoster);
         Glide.with(this).load(poster_path).into(movie_posterV);
 
         showCast(id);
         getMovieCategory(id);
+        showRecommendations(id);
+    }
+
+    private void showRecommendations(String id) {
+        String URL = "https://api.themoviedb.org/3/movie/"+id+"/recommendations?api_key=dda6d5e001bdb5b75de31631ec3fa716&language=en-US&page=1";
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+                    JSONArray jsonArray = response.getJSONArray("results");
+                    for (int i=0;i<jsonArray.length();i++){
+                        JSONObject res = jsonArray.getJSONObject(i);
+                        String title = res.getString("title");
+                        String image = "https://image.tmdb.org/t/p/original"+res.getString("poster_path");
+                        String original_language = res.getString("original_language");
+                        float rating = (float) res.getDouble("vote_average");
+                        String backdrop_path = "https://image.tmdb.org/t/p/original"+res.getString("backdrop_path");
+                        String overview = res.getString("overview");
+                        String release_date = res.getString("release_date");
+                        int id = res.getInt("id");
+
+                        similarArrayList.add(new DefaultMovies(id, image,original_language, title,backdrop_path,overview,release_date, rating));
+                    }
+                    similarAdapter = new DefaultAdapter(DetailsActivity.this, similarArrayList);
+                    recommendationRV.setAdapter(similarAdapter);
+                    similarAdapter.setOnItemUPClickListener(DetailsActivity.this);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        mRequestQueue.add(request);
     }
 
     private void getMovieCategory(String id) {
@@ -230,6 +287,26 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
         popularity.setText(String.valueOf(clickedItem.getPopularity()));
 
         alertDialog.show();
+
+    }
+
+    @Override
+    public void onItemUPClick(int position) {
+        DefaultMovies upcomingClick = similarArrayList.get(position);
+        Intent intent1 = new Intent(this, DetailsActivity.class);
+        intent1.putExtra(TITLE, upcomingClick.getTitle());
+        intent1.putExtra(POSTER, upcomingClick.getPoster_path());
+        intent1.putExtra(BACK_POSTER, upcomingClick.getBackdrop_path());
+        intent1.putExtra(OVERVIEW, upcomingClick.getOverview());
+        intent1.putExtra(RELEASE_DATE, upcomingClick.getRelease_date());
+        intent1.putExtra(VOTE, String.valueOf(upcomingClick.getVote_average()));
+        intent1.putExtra(LANG, upcomingClick.getOriginal_language());
+        intent1.putExtra(ID, String.valueOf(upcomingClick.getId()));
+        startActivity(intent1);
+    }
+
+    @Override
+    public void onItemTopClick(int position) {
 
     }
 }
