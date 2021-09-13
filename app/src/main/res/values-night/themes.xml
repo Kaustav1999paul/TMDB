@@ -32,7 +32,7 @@
         <item name="colorPrimaryDark">#FFFFFF</item>
         <item name="colorAccent">#FFFFFF</item>
         <item name="android:navigationBarColor">#FFFFFF</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="statusBarBackground">#FFFFFF</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>

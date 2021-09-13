@@ -20,8 +20,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.tmdb.Adapter.DefaultAdapter;
+import com.example.tmdb.Adapter.TVAdapter;
 import com.example.tmdb.Adapter.TrendingAdapter;
 import com.example.tmdb.Model.DefaultMovies;
+import com.example.tmdb.Model.TV;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,14 +33,15 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class HomeActivity extends AppCompatActivity implements DefaultAdapter.OnItemClickListener, TrendingAdapter.OnItemClickListener {
+public class HomeActivity extends AppCompatActivity implements DefaultAdapter.OnItemClickListener, TrendingAdapter.OnItemClickListener, TVAdapter.OnItemClickListener {
 
-    private RecyclerView popularList,nowPlaying, topRated, trendingRV;
+    private RecyclerView popularList,nowPlaying, topRated, trendingRV, tvRV;
     private DefaultAdapter defaultAdapter, upcomingAdapter;
     private TrendingAdapter trendingAdapter;
     private ArrayList<DefaultMovies> nowPlayingList, topRatedList, movieArrayList, trendingArrayList;
+    private ArrayList<TV> tvArrayList;
+    private TVAdapter tvAdapter;
     private RequestQueue mRequestQueue;
-    ImageView search;
     SnapHelper snapHelper;
     Timer timer;
     TimerTask timerTask;
@@ -60,19 +63,20 @@ public class HomeActivity extends AppCompatActivity implements DefaultAdapter.On
 
         nowPlaying = findViewById(R.id.nowPlaying);
         popularList = findViewById(R.id.mainList);
-        search = findViewById(R.id.search);
+        tvRV = findViewById(R.id.tvRV);
         topRated = findViewById(R.id.topRated);
         trendingRV = findViewById(R.id.trendingRV);
 
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
-
+        tvRV.setHasFixedSize(true);
         topRated.setHasFixedSize(true);
         popularList.setHasFixedSize(true);
         nowPlaying.setHasFixedSize(true);
         trendingRV.setHasFixedSize(true);
 
+        tvRV.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
         topRated.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
         popularList.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
         nowPlaying.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
@@ -82,17 +86,57 @@ public class HomeActivity extends AppCompatActivity implements DefaultAdapter.On
         nowPlayingList = new ArrayList<>();
         topRatedList = new ArrayList<>();
         trendingArrayList = new ArrayList<>();
+        tvArrayList = new ArrayList<>();
         mRequestQueue = Volley.newRequestQueue(this);
         snapHelper = new LinearSnapHelper();
 
-
-
         showResult();
+        showTV();
         showNowPlaying();
         showTopRated();
         trending();
         autoScroll();
 
+    }
+
+    private void showTV() {
+        String URL = "https://api.themoviedb.org/3/tv/on_the_air?api_key=dda6d5e001bdb5b75de31631ec3fa716&language=en-US&page=1";
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray jsonArray = response.getJSONArray("results");
+                    for (int i=0; i<jsonArray.length(); i++){
+                        JSONObject res = jsonArray.getJSONObject(i);
+
+                        String title = res.getString("name");
+                        String image = "https://image.tmdb.org/t/p/original"+res.getString("poster_path");
+                        String original_language = res.getString("original_language");
+                        float rating = (float) res.getDouble("vote_average");
+                        String backdrop_path = "https://image.tmdb.org/t/p/original"+res.getString("backdrop_path");
+                        String overview = res.getString("overview");
+                        String release_date = res.getString("first_air_date");
+                        int id = res.getInt("id");
+
+                        tvArrayList.add(new TV(backdrop_path, title, original_language, overview, image,release_date ,id, rating));
+                    }
+
+                    tvAdapter = new TVAdapter(HomeActivity.this, tvArrayList);
+                    tvRV.setAdapter(tvAdapter);
+                    tvAdapter.setOnItemClickListener(HomeActivity.this);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        mRequestQueue.add(request);
     }
 
     private void autoScroll(){
@@ -140,7 +184,6 @@ public class HomeActivity extends AppCompatActivity implements DefaultAdapter.On
 
                     trendingAdapter = new TrendingAdapter(HomeActivity.this, trendingArrayList);
                     trendingRV.setAdapter(trendingAdapter);
-                    //upcomingAdapter.setOnItemUPClickListener(HomeActivity.this);
                     trendingAdapter.setOnItemClickListener(HomeActivity.this);
 
                     if (trendingArrayList!= null){
@@ -345,6 +388,22 @@ public class HomeActivity extends AppCompatActivity implements DefaultAdapter.On
         Intent intent = new Intent(this, DetailsActivity.class);
         DefaultMovies clickedItem = trendingArrayList.get(position);
         intent.putExtra(TITLE, clickedItem.getTitle());
+        intent.putExtra(POSTER, clickedItem.getPoster_path());
+        intent.putExtra(BACK_POSTER, clickedItem.getBackdrop_path());
+        intent.putExtra(OVERVIEW, clickedItem.getOverview());
+        intent.putExtra(RELEASE_DATE, clickedItem.getRelease_date());
+        intent.putExtra(VOTE, String.valueOf(clickedItem.getVote_average()));
+        intent.putExtra(LANG, clickedItem.getOriginal_language());
+        intent.putExtra(ID, String.valueOf(clickedItem.getId()));
+
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemClickTV(int position) {
+        Intent intent = new Intent(this, DetailsActivity.class);
+        TV clickedItem = tvArrayList.get(position);
+        intent.putExtra(TITLE, clickedItem.getName());
         intent.putExtra(POSTER, clickedItem.getPoster_path());
         intent.putExtra(BACK_POSTER, clickedItem.getBackdrop_path());
         intent.putExtra(OVERVIEW, clickedItem.getOverview());

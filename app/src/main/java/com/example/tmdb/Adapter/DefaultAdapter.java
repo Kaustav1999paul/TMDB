@@ -54,9 +54,7 @@ public class DefaultAdapter extends RecyclerView.Adapter<DefaultAdapter.DefaultV
     @Override
     public void onBindViewHolder(@NonNull DefaultViewHolder holder, int position) {
         DefaultMovies defaultMovies = list.get(position);
-
         String imageURL = defaultMovies.getPoster_path();
-
         Glide.with(context).load(imageURL).into(holder.movie_poster);
     }
 
