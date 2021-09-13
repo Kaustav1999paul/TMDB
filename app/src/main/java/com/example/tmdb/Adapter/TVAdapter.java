@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.tmdb.Model.TV;
 import com.example.tmdb.R;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -46,6 +49,7 @@ public class TVAdapter extends RecyclerView.Adapter<TVAdapter.TVViewHolder> {
         TV tv  = tvList.get(position);
         String imageURL = tv.getPoster_path();
         Glide.with(context).load(imageURL).into(holder.movie_poster);
+        holder.rating.setText(String.valueOf(tv.getVote_average()));
     }
 
     @Override
@@ -56,10 +60,13 @@ public class TVAdapter extends RecyclerView.Adapter<TVAdapter.TVViewHolder> {
     public class TVViewHolder extends RecyclerView.ViewHolder{
 
         public ImageView movie_poster;
+        public TextView rating;
 
         public TVViewHolder(@NonNull View itemView) {
             super(itemView);
             movie_poster = itemView.findViewById(R.id.movie_poster);
+            rating= itemView.findViewById(R.id.rating);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

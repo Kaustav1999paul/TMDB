@@ -100,9 +100,10 @@ public class HomeActivity extends AppCompatActivity implements DefaultAdapter.On
     }
 
     private void showTV() {
+        String URLPopular = "https://api.themoviedb.org/3/tv/popular?api_key=dda6d5e001bdb5b75de31631ec3fa716&language=en-US&page=1";
         String URL = "https://api.themoviedb.org/3/tv/on_the_air?api_key=dda6d5e001bdb5b75de31631ec3fa716&language=en-US&page=1";
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URLPopular, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {

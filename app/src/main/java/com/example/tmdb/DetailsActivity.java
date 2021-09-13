@@ -57,7 +57,7 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
     Intent intent;
     FloatingActionButton back;
     String poster_path, original_language ,title, backdrop_path, overview, release_date, votes, id;
-    TextView titleV, overviewV, releaseDateV, langV, ratingsV, statusV;
+    TextView titleV, overviewV, releaseDateV, langV, ratingsV, statusV, recommendationsTitle, categoryTitle;
     RecyclerView castRV, categoryRV, recommendationRV;
     private RequestQueue mRequestQueue;
     private ArrayList<Cast> castArrayList;
@@ -83,6 +83,8 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
                 finish();
             }
         });
+        recommendationsTitle = findViewById(R.id.recommendationsTitle);
+        categoryTitle = findViewById(R.id.categoryTitle);
         castRV = findViewById(R.id.castRV);
         castRV.setHasFixedSize(true);
         castRV.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
@@ -139,19 +141,31 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
 
                 try {
                     JSONArray jsonArray = response.getJSONArray("results");
-                    for (int i=0;i<jsonArray.length();i++){
-                        JSONObject res = jsonArray.getJSONObject(i);
-                        String title = res.getString("title");
-                        String image = "https://image.tmdb.org/t/p/original"+res.getString("poster_path");
-                        String original_language = res.getString("original_language");
-                        float rating = (float) res.getDouble("vote_average");
-                        String backdrop_path = "https://image.tmdb.org/t/p/original"+res.getString("backdrop_path");
-                        String overview = res.getString("overview");
-                        String release_date = res.getString("release_date");
-                        int id = res.getInt("id");
 
-                        similarArrayList.add(new DefaultMovies(id, image,original_language, title,backdrop_path,overview,release_date, rating));
+                    if (jsonArray.length()!=0){
+                        recommendationsTitle.setVisibility(View.VISIBLE);
+                        recommendationRV.setVisibility(View.VISIBLE);
+
+                        for (int i=0;i<jsonArray.length();i++){
+                            JSONObject res = jsonArray.getJSONObject(i);
+                            String title = res.getString("title");
+                            String image = "https://image.tmdb.org/t/p/original"+res.getString("poster_path");
+                            String original_language = res.getString("original_language");
+                            float rating = (float) res.getDouble("vote_average");
+                            String backdrop_path = "https://image.tmdb.org/t/p/original"+res.getString("backdrop_path");
+                            String overview = res.getString("overview");
+                            String release_date = res.getString("release_date");
+                            int id = res.getInt("id");
+
+                            similarArrayList.add(new DefaultMovies(id, image,original_language, title,backdrop_path,overview,release_date, rating));
+                        }
+                    }else {
+                        recommendationsTitle.setVisibility(View.GONE);
+                        recommendationRV.setVisibility(View.GONE);
                     }
+
+
+
                     similarAdapter = new DefaultAdapter(DetailsActivity.this, similarArrayList);
                     recommendationRV.setAdapter(similarAdapter);
                     similarAdapter.setOnItemUPClickListener(DetailsActivity.this);
@@ -184,12 +198,23 @@ public class DetailsActivity extends AppCompatActivity implements CastAdapter.On
                     statusV.setText(status);
 
                     JSONArray jsonArray = response.getJSONArray("genres");
-                    for (int i=0;i<jsonArray.length();i++){
-                        JSONObject res = jsonArray.getJSONObject(i);
 
-                        String name = res.getString("name");
-                        genresArrayList.add(new Genres(name));
+                    if (jsonArray.length()!=0){
+
+                        categoryTitle.setVisibility(View.VISIBLE);
+                        categoryRV.setVisibility(View.VISIBLE);
+
+                        for (int i=0;i<jsonArray.length();i++){
+                            JSONObject res = jsonArray.getJSONObject(i);
+
+                            String name = res.getString("name");
+                            genresArrayList.add(new Genres(name));
+                        }
+                    }else {
+                        categoryTitle.setVisibility(View.GONE);
+                        categoryRV.setVisibility(View.GONE);
                     }
+
                     genresAdapter = new GenresAdapter(DetailsActivity.this, genresArrayList);
                     categoryRV.setAdapter(genresAdapter);
 

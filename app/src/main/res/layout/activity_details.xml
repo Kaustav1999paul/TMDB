@@ -149,6 +149,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/categoryTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="20dp"
@@ -177,13 +178,14 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/castRV"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="30dp"/>
 
                     <TextView
+                        android:id="@+id/recommendationsTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="20dp"
-                        android:layout_marginTop="30dp"
                         android:text="Recommendations"
                         android:textColor="#F44336"
                         android:textSize="16dp"

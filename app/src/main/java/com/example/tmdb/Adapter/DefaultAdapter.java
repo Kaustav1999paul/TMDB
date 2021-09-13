@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,6 +57,7 @@ public class DefaultAdapter extends RecyclerView.Adapter<DefaultAdapter.DefaultV
         DefaultMovies defaultMovies = list.get(position);
         String imageURL = defaultMovies.getPoster_path();
         Glide.with(context).load(imageURL).into(holder.movie_poster);
+        holder.rating.setText(String.valueOf(defaultMovies.getVote_average()));
     }
 
     @Override
@@ -66,11 +68,13 @@ public class DefaultAdapter extends RecyclerView.Adapter<DefaultAdapter.DefaultV
     public class DefaultViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView movie_poster;
+        public TextView rating;
 
         public DefaultViewHolder(View itemView) {
             super(itemView);
 
             movie_poster = itemView.findViewById(R.id.movie_poster);
+            rating= itemView.findViewById(R.id.rating);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
